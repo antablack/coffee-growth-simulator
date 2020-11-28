@@ -5,6 +5,9 @@ import math
 INTERVALE_OF_MONTHS = 3
 YEARS_TO_SIMULATE = 5
 
+PERCENTAGE_REDUCTION_WATER_DEFICIT = 0.05
+
+
 
 def get_months():
     months = []
@@ -35,8 +38,8 @@ def water_requirements(densidad, month):
     else:
         return 0
 
-#def defficit_water(params, water_requirement):
-    #return params['cad'] - (water_requirement * (params['meses_cons_secos'] * 30))
+def get_optimal_density(solar_ligth_year, capacity_save_water, months_sequia):
+    return 7429.170455 + (-2.160113636 * solar_ligth_year) + (39.48238636 * capacity_save_water) + (-0.08522727271 * months_sequia)
 
 class Simulation:
 
@@ -56,20 +59,29 @@ class Simulation:
                 next_month = month + i
                 water_requirement = water_requirements(params['densidad'], next_month ) * 30
                 cad -= water_requirement
-                print(water_requirement)
                 if cad < 0 :
-                    reduction = self.predictions[next_month] * 0.05
+                    reduction = self.predictions[next_month] * PERCENTAGE_REDUCTION_WATER_DEFICIT
                     self.predictions[next_month] -= reduction
                     for i2 in range(next_month + 1, len(self.predictions)):
                         self.predictions[i2] -= reduction
 
+    def apply_density_restrictions(self):
+        optimal_density = get_optimal_density(self.params['horas_brillo_solar'], self.params['cad'], self.params['meses_cons_secos'])
+        print(optimal_density)
+        if self.params['densidad'] > optimal_density :
+            over_flow = self.params['densidad'] - optimal_density
+            percentage_reduction = ((over_flow * 100) / optimal_density) / 100
+            for i in range(0, len(self.predictions)):
+                print(percentage_reduction)
+                self.predictions[i] -= self.predictions[i] * (percentage_reduction)
 
 
 
     def start(self):
         
         self.apply_water_restrictions()
-        
+        self.apply_density_restrictions()
+
         return self.predictions
 
 
@@ -77,11 +89,11 @@ class Simulation:
 
 
 if __name__ == '__main__':
-    
     params = {
         'densidad': 5500,
         'cad': 57,
-        'meses_cons_secos': 2
+        'meses_cons_secos': 1,
+        'horas_brillo_solar': 1400
     }
     print(water_requirements(params['densidad'], 38))
     
