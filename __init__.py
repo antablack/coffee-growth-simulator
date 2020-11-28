@@ -6,6 +6,7 @@ INTERVALE_OF_MONTHS = 3
 YEARS_TO_SIMULATE = 5
 
 PERCENTAGE_REDUCTION_WATER_DEFICIT = 0.05
+PERCENTAGE_REDUCTION_OVERDENSITY = 0.60
 
 
 
@@ -72,8 +73,7 @@ class Simulation:
             over_flow = self.params['densidad'] - optimal_density
             percentage_reduction = ((over_flow * 100) / optimal_density) / 100
             for i in range(0, len(self.predictions)):
-                print(percentage_reduction)
-                self.predictions[i] -= self.predictions[i] * (percentage_reduction)
+                self.predictions[i] -= self.predictions[i] * percentage_reduction * PERCENTAGE_REDUCTION_OVERDENSITY
 
 
 
@@ -90,7 +90,7 @@ class Simulation:
 
 if __name__ == '__main__':
     params = {
-        'densidad': 5500,
+        'densidad': 7500,
         'cad': 57,
         'meses_cons_secos': 1,
         'horas_brillo_solar': 1400
