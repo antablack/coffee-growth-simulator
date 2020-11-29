@@ -9,7 +9,7 @@ from PyInquirer import Validator, ValidationError
 INTERVALE_OF_MONTHS = 3
 YEARS_TO_SIMULATE = 5
 
-PERCENTAGE_REDUCTION_WATER_DEFICIT = 0.05
+PERCENTAGE_REDUCTION_WATER_DEFICIT = 0.025
 PERCENTAGE_REDUCTION_OVERDENSITY = 0.60
 
 PERCENTAGE_INCREASE_NUTRIENTS = 0.01
@@ -100,7 +100,7 @@ class Simulation:
     def apply_water_restrictions(self):
         for month in range(0, len(self.months), 12):
             months_water_restrictions = int(self.params["meses_cons_secos"])
-            cad = int(self.params['cad'])
+            cad = float(self.params['cad'])
 
             for i in range(months_water_restrictions):
                 next_month = month + i
