@@ -2,12 +2,18 @@
 import matplotlib.pyplot as plt
 import math
 import numpy as np
+from pprint import pprint
+from PyInquirer import style_from_dict, Token, prompt
+from PyInquirer import Validator, ValidationError
 
 INTERVALE_OF_MONTHS = 3
 YEARS_TO_SIMULATE = 5
 
 PERCENTAGE_REDUCTION_WATER_DEFICIT = 0.05
 PERCENTAGE_REDUCTION_OVERDENSITY = 0.60
+
+PERCENTAGE_INCREASE_NUTRIENTS = 0.02
+PERCENTAGE_DECREASE_NUTRIENTS = 0.025
 
 def get_months():
     months = []
@@ -73,6 +79,15 @@ def nutrients_by_months(mo, month):
 def run_linear(a, b, month): #Y= a + bX
     return a + b * month
 
+class NumberValidator(Validator):
+    def validate(self, document):
+        try:
+            float(document.text)
+        except ValueError:
+            raise ValidationError(
+                message='Please enter a number',
+                cursor_position=len(document.text))  # Move cursor to end
+            
 class Simulation:
 
     def __init__(self, params):
@@ -99,7 +114,6 @@ class Simulation:
 
     def apply_density_restrictions(self):
         optimal_density = get_optimal_density(self.params['horas_brillo_solar'], self.params['cad'], self.params['meses_cons_secos'])
-        print(optimal_density)
         if self.params['densidad'] > optimal_density :
             over_flow = self.params['densidad'] - optimal_density
             percentage_reduction = ((over_flow * 100) / optimal_density) / 100
@@ -133,9 +147,9 @@ class Simulation:
 
 
             if current_nit > ideal_nit or current_ur > ideal_ur:
-                self.increase_values(i, 0.02)
+                self.increase_values(i, PERCENTAGE_INCREASE_NUTRIENTS)
             else:
-                self.decrease_values(i, 0.025)
+                self.decrease_values(i, PERCENTAGE_DECREASE_NUTRIENTS)
 
     def start(self):
         
@@ -146,24 +160,172 @@ class Simulation:
         return self.predictions
 
 if __name__ == '__main__':
-    params = {
-        'densidad': 7500,
-        'cad': 57,
-        'meses_cons_secos': 1,
-        'horas_brillo_solar': 1400,
-        'mo': 8,
-        'nit_2': 7,
-        'nit_6': 9,
-        'nit_10': 12,
-        'nit_14': 14,
-        'nit_18': 16,
+    questions = [
+        {
+            'type': 'input',
+            'name': 'distancia_calle',
+            'message': 'Distancia entre calles (m)',
+            'validate': NumberValidator,
+            'default': '1.5'
+        },
+        {
+            'type': 'input',
+            'name': 'distancia_entre_plantas',
+            'message': 'Distancia entre plantas (m)',
+            'validate': NumberValidator,
+            'default': '1'
+        },
+        {
+            'type': 'input',
+            'name': 'cad',
+            'message': 'Capacidad de almacenamiento de agua CAD',
+            'validate': NumberValidator,
+            'default': '100'
+        },
+        {
+            'type': 'input',
+            'name': 'meses_cons_secos',
+            'message': 'Meses consecutivos secos',
+            'validate': NumberValidator,
+            'default': '1'
+        },
+        {
+            'type': 'input',
+            'name': 'horas_brillo_solar',
+            'message': 'Horas de brillo solar por año',
+            'validate': NumberValidator,
+            'default': '1400'
+        },
+        {
+            'type': 'input',
+            'name': 'mo',
+            'message': 'Indice de materia organica suelo %',
+            'validate': NumberValidator,
+            'default': '8'
+        },
+        # ----------
+        {
+            'type': 'input',
+            'name': 'nit_2',
+            'message': 'Nitrogeno (N) Mes 2 g/planta',
+            'validate': NumberValidator,
+            'default': '7'
+        },
+        {
+            'type': 'input',
+            'name': 'urea_2',
+            'message': 'Urea (CH₄N₂O) Mes 2 g/planta',
+            'validate': NumberValidator,
+            'default': '15'
+        },
+        {
+            'type': 'input',
+            'name': 'nit_6',
+            'message': 'Nitrogeno (N) Mes 6 g/planta',
+            'validate': NumberValidator,
+            'default': '9'
+        },
+        {
+            'type': 'input',
+            'name': 'urea_6',
+            'message': 'Urea (CH₄N₂O) Mes 6 g/planta',
+            'validate': NumberValidator,
+            'default': '20'
+        },
+        {
+            'type': 'input',
+            'name': 'nit_10',
+            'message': 'Nitrogeno (N) Mes 10 g/planta',
+            'validate': NumberValidator,
+            'default': '12'
+        },
+        {
+            'type': 'input',
+            'name': 'urea_10',
+            'message': 'Urea (CH₄N₂O) Mes 10 g/planta',
+            'validate': NumberValidator,
+            'default': '26'
+        },
+        {
+            'type': 'input',
+            'name': 'nit_14',
+            'message': 'Nitrogeno (N) Mes 14 g/planta',
+            'validate': NumberValidator,
+            'default': '14'
+        },
+        {
+            'type': 'input',
+            'name': 'urea_14',
+            'message': 'Urea (CH₄N₂O) Mes 14 g/planta',
+            'validate': NumberValidator,
+            'default': '30'
+        },
+        {
+            'type': 'input',
+            'name': 'nit_18',
+            'message': 'Nitrogeno (N) Mes 18 g/planta',
+            'validate': NumberValidator,
+            'default': '16'
+        },
+        {
+            'type': 'input',
+            'name': 'urea_18',
+            'message': 'Urea (CH₄N₂O) Mes 18 g/planta',
+            'validate': NumberValidator,
+            'default': '35'
+        }
+    ]
 
-        'urea_2': 15,
-        'urea_6': 20,
-        'urea_10': 26,
-        'urea_14': 30,
-        'urea_18': 35
+    style = style_from_dict({
+        Token.QuestionMark: '#E91E63 bold',
+        Token.Selected: '#673AB7 bold',
+        Token.Instruction: '',  # default
+        Token.Answer: '#2196f3 bold',
+        Token.Question: '',
+    })
+
+
+    answers = prompt(questions, style=style)
+
+    params = {
+        'densidad': 10000 / (float(answers['distancia_calle']) * float(answers['distancia_entre_plantas'])),
+        'cad': float(answers['cad']),
+        'meses_cons_secos': float(answers['meses_cons_secos']),
+        'horas_brillo_solar': float(answers['horas_brillo_solar']),
+        'mo': float(answers['mo']),
+        'nit_2': float(answers['nit_2']),
+        'nit_6': float(answers['nit_6']),
+        'nit_10': float(answers['nit_10']),
+        'nit_14': float(answers['nit_14']),
+        'nit_18': float(answers['nit_18']),
+
+        'urea_2': float(answers['urea_2']),
+        'urea_6': float(answers['urea_6']),
+        'urea_10': float(answers['urea_10']),
+        'urea_14': float(answers['urea_14']),
+        'urea_18': float(answers['urea_18']),
     }
+
+    #params = {
+    #    'densidad': 10000 / (float(answers['distancia_calle']) * float(answers['distancia_entre_plantas'])),
+    #    'cad': 57,
+    #    'meses_cons_secos': 1,
+    #    'horas_brillo_solar': 1400,
+    #    'mo': 8,
+    #    'nit_2': 7,
+    #    'nit_6': 9,
+    #    'nit_10': 12,
+    #    'nit_14': 14,
+    #    'nit_18': 16,
+    #    'urea_2': 15,
+    #    'urea_6': 20,
+    #    'urea_10': 26,
+    #    'urea_14': 30,
+    #    'urea_18': 35
+    #}
+
+    #print(params['densidad'])
+    
     simulation = Simulation(params)
 
     predictions = simulation.start()

@@ -1,0 +1,7 @@
+matplotlib
+math
+numpy
+pprint
+PyInquirer
+
+
