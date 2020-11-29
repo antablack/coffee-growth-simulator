@@ -182,7 +182,7 @@ if __name__ == '__main__':
         {
             'type': 'input',
             'name': 'cad',
-            'message': 'Capacidad de almacenamiento de agua CAD',
+            'message': 'Capacidad de almacenamiento de agua CA',
             'validate': NumberValidator,
             'default': '100'
         },
