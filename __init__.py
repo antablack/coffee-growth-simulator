@@ -12,8 +12,8 @@ YEARS_TO_SIMULATE = 5
 PERCENTAGE_REDUCTION_WATER_DEFICIT = 0.05
 PERCENTAGE_REDUCTION_OVERDENSITY = 0.60
 
-PERCENTAGE_INCREASE_NUTRIENTS = 0.02
-PERCENTAGE_DECREASE_NUTRIENTS = 0.025
+PERCENTAGE_INCREASE_NUTRIENTS = 0.01
+PERCENTAGE_DECREASE_NUTRIENTS = 0.0125
 
 def get_months():
     months = []
@@ -325,7 +325,7 @@ if __name__ == '__main__':
     #}
 
     #print(params['densidad'])
-    
+
     simulation = Simulation(params)
 
     predictions = simulation.start()
