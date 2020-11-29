@@ -14,6 +14,7 @@ PERCENTAGE_REDUCTION_OVERDENSITY = 0.60
 
 PERCENTAGE_INCREASE_NUTRIENTS = 0.01
 PERCENTAGE_DECREASE_NUTRIENTS = 0.0125
+PERCENTAGE_MAX_INCRIMENT = 1.125
 
 def get_months():
     months = []
@@ -122,6 +123,9 @@ class Simulation:
 
     def increase_values(self, i, percentage):
          for i in range(i, len(self.predictions)):
+                if (self.predictions[i] + (self.predictions[i] * percentage)) > (self.baseline_predictions[i] * PERCENTAGE_MAX_INCRIMENT):
+                    continue
+
                 self.predictions[i] += self.predictions[i] * percentage
     
     def decrease_values(self, i, percentage):
