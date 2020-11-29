@@ -330,8 +330,10 @@ if __name__ == '__main__':
 
     predictions = simulation.start()
 
-    plt.plot(simulation.months, simulation.baseline_predictions) #, 'o-')
-    plt.plot(simulation.months, predictions) #, 'o-')
+    plt.plot(simulation.months, simulation.baseline_predictions, "-b", label='Crecimiento ideal') #, 'o-')
+    plt.plot(simulation.months, predictions, "-r", label='Crecimiento simulado') #, 'o-')
+    plt.legend(loc="upper left")
     plt.ylabel('Altura (cm)') 
     plt.xlabel('Tiempo (meses)')
+    plt.title('Simulacion crecimiento cafe en un periodo de 5 años (60 meses)')
     plt.show()
